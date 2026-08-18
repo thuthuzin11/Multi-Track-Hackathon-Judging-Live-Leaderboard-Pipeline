@@ -1,12 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .config import ALLOWED_ORIGINS
 from .database import Base, engine
 from .routers import admin, scores, leaderboard, auth, catalog
 
-# Create tables if they don't exist yet (fine for a school project;
-# use Alembic migrations for anything production-grade).
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
@@ -19,14 +16,16 @@ app = FastAPI(
     version="1.0.0",
 )
 
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=ALLOWED_ORIGINS,
-    # Judges authenticate with a Bearer token in the Authorization header,
-    # not cookies, so credentialed CORS isn't needed -- this also lets us
-    # keep allow_origins=["*"] for easy multi-location access without
-    # violating the browser's "no wildcard + credentials" rule.
-    allow_credentials=False,
+    allow_origins=[
+        "https://imaginative-custard-ef8c4b.netlify.app",
+        "http://localhost:3000",
+        "http://localhost:5173",
+        "*"
+    ],
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
