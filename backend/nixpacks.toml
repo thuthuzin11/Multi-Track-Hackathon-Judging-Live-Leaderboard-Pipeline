@@ -1,0 +1,5 @@
+[providers]
+providers = ["python"]
+
+[apt]
+pkgs = ["libpq-dev", "gcc"]
