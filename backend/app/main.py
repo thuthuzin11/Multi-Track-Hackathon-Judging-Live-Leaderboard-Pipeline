@@ -1,8 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from .config import ALLOWED_ORIGINS
 from .database import Base, engine
-from .routers import admin, scores, leaderboard, auth, catalog
+from .routers import admin, auth, catalog, leaderboard, scores
 
 Base.metadata.create_all(bind=engine)
 
@@ -16,18 +17,14 @@ app = FastAPI(
     version="1.0.0",
 )
 
-
+# CORS Configuration
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "https://imaginative-custard-ef8c4b.netlify.app",
-        "http://localhost:3000",
-        "http://localhost:5173",
-        "*"
-    ],
+    allow_origins=ALLOWED_ORIGINS,
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allow_headers=["*"],
+    expose_headers=["*"],
 )
 
 app.include_router(auth.router)
