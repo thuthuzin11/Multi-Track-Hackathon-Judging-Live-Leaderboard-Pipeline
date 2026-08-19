@@ -94,6 +94,7 @@ function ViewerSignupForm({ onAuthenticated }) {
 function RoleLoginForm({ role, onAuthenticated }) {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(false)
 
@@ -132,13 +133,35 @@ function RoleLoginForm({ role, onAuthenticated }) {
       </label>
       <label>
         Password
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          autoComplete="current-password"
-          required
-        />
+        <div className="password-input-wrap">
+          <input
+            type={showPassword ? 'text' : 'password'}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            autoComplete="current-password"
+            required
+          />
+          <button
+            type="button"
+            className="password-toggle"
+            onClick={() => setShowPassword((prev) => !prev)}
+            aria-label={showPassword ? 'Hide password' : 'Show password'}
+            title={showPassword ? 'Hide password' : 'Show password'}
+          >
+            {showPassword ? (
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M3 3l18 18" />
+                <path d="M10.58 10.58A2 2 0 0 0 13.42 13.42" />
+                <path d="M9.88 5.08A10.94 10.94 0 0 1 12 5c4.03 0 7.5 2.33 9 7a14.86 14.86 0 0 1-3.3 5.12M6.61 6.61A13.55 13.55 0 0 0 3 12c1.5 4.67 5 7 9 7a10.7 10.7 0 0 0 4.39-1.01" />
+              </svg>
+            ) : (
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z" />
+                <circle cx="12" cy="12" r="3" />
+              </svg>
+            )}
+          </button>
+        </div>
       </label>
       <button type="submit" className="primary" disabled={loading}>
         {loading ? 'Signing in…' : 'Sign In'}
