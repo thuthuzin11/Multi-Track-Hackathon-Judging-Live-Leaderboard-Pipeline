@@ -19,6 +19,7 @@ export default function EntityManager({ title, items, fields, onCreate, onUpdate
   const [form, setForm] = useState(emptyForm)
   const [editingId, setEditingId] = useState(null)
   const [editValues, setEditValues] = useState({})
+  const [showPasswordMap, setShowPasswordMap] = useState({})
   const [error, setError] = useState(null)
   const [notice, setNotice] = useState(null)
 
@@ -77,7 +78,12 @@ export default function EntityManager({ title, items, fields, onCreate, onUpdate
     }
   }
 
-  const renderInput = (field, value, onChange) => {
+  const togglePasswordVisibility = (fieldKey, itemId = 'new') => {
+    const targetKey = `${itemId}:${fieldKey}`
+    setShowPasswordMap((prev) => ({ ...prev, [targetKey]: !prev[targetKey] }))
+  }
+
+  const renderInput = (field, value, onChange, itemId = 'new') => {
     if (field.type === 'select') {
       return (
         <select value={value} onChange={(e) => onChange(e.target.value)}>
@@ -98,9 +104,42 @@ export default function EntityManager({ title, items, fields, onCreate, onUpdate
         />
       )
     }
+    if (field.type === 'password') {
+      const passwordVisible = !!showPasswordMap[`${itemId}:${field.key}`]
+      return (
+        <div className="password-field-wrap">
+          <input
+            type={passwordVisible ? 'text' : 'password'}
+            placeholder={field.editPlaceholder || field.label}
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+          />
+          <button
+            type="button"
+            className="password-visibility-toggle"
+            onClick={() => togglePasswordVisibility(field.key, itemId)}
+            aria-label={passwordVisible ? 'Hide password' : 'Show password'}
+            title={passwordVisible ? 'Hide password' : 'Show password'}
+          >
+            {passwordVisible ? (
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M3 3l18 18" />
+                <path d="M10.58 10.58A2 2 0 0 0 13.42 13.42" />
+                <path d="M9.88 5.08A10.94 10.94 0 0 1 12 5c4.03 0 7.5 2.33 9 7a14.86 14.86 0 0 1-3.3 5.12M6.61 6.61A13.55 13.55 0 0 0 3 12c1.5 4.67 5 7 9 7a10.7 10.7 0 0 0 4.39-1.01" />
+              </svg>
+            ) : (
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z" />
+                <circle cx="12" cy="12" r="3" />
+              </svg>
+            )}
+          </button>
+        </div>
+      )
+    }
     return (
       <input
-        type={field.type === 'password' ? 'password' : 'text'}
+        type="text"
         placeholder={field.editPlaceholder || field.label}
         value={value}
         onChange={(e) => onChange(e.target.value)}
@@ -128,7 +167,7 @@ export default function EntityManager({ title, items, fields, onCreate, onUpdate
       <form onSubmit={handleCreate} className="entity-create-form">
         {fields.map((f) => (
           <React.Fragment key={f.key}>
-            {renderInput(f, form[f.key], (v) => setForm((s) => ({ ...s, [f.key]: v })))}
+            {renderInput(f, form[f.key], (v) => setForm((s) => ({ ...s, [f.key]: v })), 'new')}
           </React.Fragment>
         ))}
         <button type="submit">Add</button>
@@ -154,7 +193,7 @@ export default function EntityManager({ title, items, fields, onCreate, onUpdate
                   {fields.map((f) => (
                     <td key={f.key}>
                       {isEditing
-                        ? renderInput(f, editValues[f.key], (v) => setEditValues((s) => ({ ...s, [f.key]: v })))
+                        ? renderInput(f, editValues[f.key], (v) => setEditValues((s) => ({ ...s, [f.key]: v })), item[idKey])
                         : (f.type === 'password' ? '••••••••' : labelFor(f, item))}
                     </td>
                   ))}
