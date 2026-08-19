@@ -153,7 +153,7 @@ export default function AdminDashboard() {
           onDelete={(id) => api.deleteJudge(id).then(refreshAll)}
         />
 
-        <h3>Results table (PostgreSQL, authoritative — every event)</h3>
+        <h3>Results table ( authoritative — every event)</h3>
         <div className="table-scroll">
           <table className="results-table">
             <thead>
